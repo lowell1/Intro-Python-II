@@ -1,4 +1,6 @@
 from room import Room
+from player import Player
+from textwrap3 import TextWrapper
 
 # Declare all the rooms
 
@@ -18,7 +20,7 @@ to north. The smell of gold permeates the air."""),
 
     'treasure': Room("Treasure Chamber", """You've found the long-lost treasure
 chamber! Sadly, it has already been completely emptied by
-earlier adventurers. The only exit is to the south."""),
+earlier adventurers. The only exit is to the south.""")
 }
 
 
@@ -38,7 +40,6 @@ room['treasure'].s_to = room['narrow']
 #
 
 # Make a new player object that is currently in the 'outside' room.
-
 # Write a loop that:
 #
 # * Prints the current room name
@@ -49,3 +50,24 @@ room['treasure'].s_to = room['narrow']
 # Print an error message if the movement isn't allowed.
 #
 # If the user enters "q", quit the game.
+
+player = Player(room["outside"])
+
+cmd = ""
+
+directions = ("south", "north", "west", "east")
+
+textwrap = TextWrapper(initial_indent = "      ", subsequent_indent = "      ", width=50)
+
+
+while cmd != "q":
+    print(f"\nYou are in the {player.current_room.name} room\n\n{textwrap.fill(player.current_room.description)}\n")
+    
+    possible_directions = [f"({ele[0]}){ele[1:]}" for ele in directions if hasattr(player.current_room, ele[0] + "_to")]
+    cmd = input("Enter a command  %s (q)uit: " % ", ".join(possible_directions)).lower()
+    
+    if hasattr(player.current_room, cmd + "_to"):
+        player.current_room = getattr(player.current_room, cmd + "_to")
+    else if cmd != "q":
+        print("Invalid movement")
+    
