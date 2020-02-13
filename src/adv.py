@@ -1,12 +1,14 @@
 from room import Room
 from player import Player
 from textwrap3 import TextWrapper
+from item import Item
 
 # Declare all the rooms
 
 room = {
     'outside':  Room("Outside Cave Entrance",
-                     "North of you, the cave mount beckons"),
+                     "North of you, the cave mount beckons",
+                     [Item("item1", "?????????"), Item("item2", "?????????")]),
 
     'foyer':    Room("Foyer", """Dim light filters in from the south. Dusty
 passages run north and east."""),
@@ -59,15 +61,23 @@ directions = ("south", "north", "west", "east")
 
 textwrap = TextWrapper(initial_indent = "      ", subsequent_indent = "      ", width=50)
 
-
 while cmd != "q":
     print(f"\nYou are in the {player.current_room.name} room\n\n{textwrap.fill(player.current_room.description)}\n")
     
+    item_names = [item.name for item in player.current_room.items]
+    print("In the room you see the following items: %s" % (", ".join(item_names) or "(no items)"))
+#    if(player.current_room.items):
+
+    #the directions you can go from the current room (north, east, west, south)
     possible_directions = [f"({ele[0]}){ele[1:]}" for ele in directions if hasattr(player.current_room, ele[0] + "_to")]
-    cmd = input("Enter a command  %s (q)uit: " % ", ".join(possible_directions)).lower()
     
+    cmd = input("Enter a command  %s (q)uit, take <item>, drop <item>: " % ", ".join(possible_directions)).lower()
+    
+    #if the user enters a direction (e,n,w,s), concatenate "_to" to make "e_to", "n_to" etc
+    #make sure room has this attribute or else getattr will raise an error
+    #set "player.current_room" to the instance of "Room" that the attribute "?_to" references
     if hasattr(player.current_room, cmd + "_to"):
         player.current_room = getattr(player.current_room, cmd + "_to")
-    else if cmd != "q":
-        print("Invalid movement")
+    elif cmd != "q":
+        print("unknown command or invalid direction")
     
